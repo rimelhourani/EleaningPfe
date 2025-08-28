@@ -18,12 +18,13 @@ public class Module {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
 
+    private Long id;
     private String nom;
     private String plan;
     private String prix;
     private String description;
+    private String image;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categorie")

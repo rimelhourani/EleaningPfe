@@ -1,6 +1,7 @@
 package com.securite.serviceimpl;
 import com.dto.AdministrateurDto;
 import com.securite.models.Administrateur;
+import com.securite.models.Erole;
 import com.securite.models.Role;
 import com.securite.repository.AdministrateurRepository;
 import com.securite.repository.RoleRepository;
@@ -36,7 +37,7 @@ public class AdministrateurServiceImpl implements AdministrateurService {
         Role userRole = roleRepository.findByName("administrateur")
                 .orElseThrow(() -> new RuntimeException("Rôle 'administrateur' non trouvé"));
         roles.add(userRole);
-        administrateur.setRoles(roles);
+        administrateur.setRole(Erole.ADMINISTRATEUR);
         administrateur.setEnabled(true);
 
 

@@ -16,14 +16,14 @@ public class FileStorageService {
 
         private final String uploadDir = "uploads/";
 
-        public String saveFile(MultipartFile file, Long formationId) throws IOException {
-            String formationFolder = uploadDir + "formation_" + formationId;
-            File directory = new File(formationFolder);
+        public String saveFile(MultipartFile file, Long moduleId) throws IOException {
+            String moduleFolder = uploadDir + "module_" + moduleId;
+            File directory = new File(moduleFolder);
             if (!directory.exists()) {
                 directory.mkdirs();
             }
 
-            String filePath = formationFolder + "/" + file.getOriginalFilename();
+            String filePath = moduleFolder + "/" + file.getOriginalFilename();
             Path path = Paths.get(filePath);
             Files.write(path, file.getBytes());
 

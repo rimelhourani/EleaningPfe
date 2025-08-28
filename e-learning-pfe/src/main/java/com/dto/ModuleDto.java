@@ -1,7 +1,6 @@
 package com.dto;
 
 import com.entities.Module;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,18 +17,17 @@ import java.util.stream.Collectors;
 @SuperBuilder
 public class ModuleDto {
 
-    private int id;
+    private Long id;
     private String nom;
     private String plan;
     private String prix;
     private String description;
+    private String image;
+    private Long categorieId;
+    private Long formateurId;
+    private List<Long> chapitreIds;
 
-    private CategorieDto categorie;   // ou juste categorieId si tu veux simplifier
-    private FormateurDto formateur;   // tu as déjà créé FormateurDto
-    private List<ChapitreDto> chapitres;
-
-    // ----------------- MAPPER -----------------
-
+    // === Mapping : Entity -> DTO ===
     public static ModuleDto toDto(Module module) {
         if (module == null) return null;
 
@@ -39,16 +37,16 @@ public class ModuleDto {
                 .plan(module.getPlan())
                 .prix(module.getPrix())
                 .description(module.getDescription())
-                .categorie(CategorieDto.toDto(module.getCategorie()))
-                .formateur(FormateurDto.toDto(module.getFormateur()))
-                .chapitres(module.getChapitres() != null
-                        ? module.getChapitres().stream()
-                        .map(ChapitreDto::toDto)
-                        .collect(Collectors.toList())
+                .image(module.getImage())
+                .categorieId(module.getCategorie() != null ? module.getCategorie().getId() : null)
+                .formateurId(module.getFormateur() != null ? module.getFormateur().getId() : null)
+                .chapitreIds(module.getChapitres() != null
+                        ? module.getChapitres().stream().map(c -> c.getId()).collect(Collectors.toList())
                         : null)
                 .build();
     }
 
+    // === Mapping : DTO -> Entity ===
     public static Module toEntity(ModuleDto dto) {
         if (dto == null) return null;
 
@@ -58,15 +56,7 @@ public class ModuleDto {
         module.setPlan(dto.getPlan());
         module.setPrix(dto.getPrix());
         module.setDescription(dto.getDescription());
-        module.setCategorie(CategorieDto.toEntity(dto.getCategorie()));
-        module.setFormateur(FormateurDto.toEntity(dto.getFormateur()));
-        module.setChapitres(dto.getChapitres() != null
-                ? dto.getChapitres().stream()
-                .map(ChapitreDto::toEntity)
-                .collect(Collectors.toList())
-                : null);
-
+        module.setImage(dto.getImage());
         return module;
     }
 }
-

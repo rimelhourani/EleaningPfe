@@ -15,13 +15,11 @@ import java.util.stream.Collectors;
 @SuperBuilder
 public class CategorieDto {
 
-    private int id;
+    private long id;
     private String nom;
+    private String description;
 
-    // ⚠️ Attention : inclure la liste des modules peut créer une boucle infinie
-    // (car ModuleDto contient déjà CategorieDto).
-    // Pour éviter ça, on peut exposer seulement les IDs ou bien utiliser un DTO léger.
-    private List<ModuleDto> modules;
+//    private List<ModuleDto> modules;
 
     // ----------------- MAPPER -----------------
 
@@ -31,17 +29,7 @@ public class CategorieDto {
         return CategorieDto.builder()
                 .id(categorie.getId())
                 .nom(categorie.getNom())
-                .modules(categorie.getModules() != null
-                        ? categorie.getModules().stream()
-                        .map(m -> ModuleDto.builder()
-                                .id(m.getId())
-                                .nom(m.getNom())
-                                .plan(m.getPlan())
-                                .prix(m.getPrix())
-                                .description(m.getDescription())
-                                .build()
-                        ).collect(Collectors.toList())
-                        : null)
+                .description(categorie.getDescription())
                 .build();
     }
 
@@ -51,14 +39,7 @@ public class CategorieDto {
         Categorie categorie = new Categorie();
         categorie.setId(dto.getId());
         categorie.setNom(dto.getNom());
-
-        // ⚠️ Pour éviter boucle infinie, on ne reconstruit pas modules ici,
-        // sauf si c’est vraiment nécessaire
-        if (dto.getModules() != null) {
-            categorie.setModules(dto.getModules().stream()
-                    .map(ModuleDto::toEntity)
-                    .collect(Collectors.toList()));
-        }
+         categorie.setDescription(dto.getDescription());
 
         return categorie;
     }

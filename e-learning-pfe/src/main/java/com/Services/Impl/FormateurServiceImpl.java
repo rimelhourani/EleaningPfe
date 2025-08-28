@@ -7,6 +7,7 @@ import com.dto.FormateurDto;
 import com.entities.Formateur;
 import com.repositories.ApprenantRepository;
 import com.repositories.FormateurRepository;
+import com.securite.models.Erole;
 import com.securite.models.Role;
 import com.securite.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class FormateurServiceImpl implements FormateurService {
         // Attribuer le rôle "Formateur"
         Role formateurRole = roleRepository.findByName("formateur")
                 .orElseThrow(() -> new RuntimeException("Role formateur not found"));
-        formateur.setRoles(List.of(formateurRole));
+        formateur.setRole(Erole.FORMATEUR);
 
         // Sauvegarder
         formateur = formateurRepository.save(formateur);

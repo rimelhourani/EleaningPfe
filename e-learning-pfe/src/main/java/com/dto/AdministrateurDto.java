@@ -25,7 +25,7 @@ public class AdministrateurDto extends RegisterRequest {
 				.email(request.getEmail())
 				.password(request.getPassword())
 				.adress(request.getAdress()).phone(request.getPhone())
-
+				.isadmim(request.getIsadmim())
 				.build();
 
 	}
@@ -38,7 +38,7 @@ public class AdministrateurDto extends RegisterRequest {
 				.email(request.getEmail())
 				.password(request.getPassword())
 				.phone(request.getPhone())
-
+				.isadmim(request.getIsadmim())
 				.build();
 
 	}

@@ -17,11 +17,12 @@ public class Categorie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
 
     private String nom;
+    private String description;
 
 
-    @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Module> modules;
+//    @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Module> modules;
 }

@@ -1,12 +1,14 @@
 package com.securite.auth;
 
 
+import com.dto.AdministrateurDto;
 import com.dto.ApprenantDto;
 import com.securite.config.LogoutService;
 import com.securite.models.AuthenticationRequest;
 import com.securite.models.AuthenticationResponse;
 import com.securite.models.RegisterRequest;
 import com.securite.models.Response;
+import com.securite.service.AdministrateurService;
 import com.securite.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,22 +31,12 @@ public class AuthenticationController {
   private final UserService userService;
   private final LogoutService logoutService;
 
+
   @PostMapping("/register")
-  public ResponseEntity<Response> register(
-          @RequestBody @Valid RegisterRequest userRequest,
-          HttpServletRequest request
-  )  {
-    return service.register(userRequest,request);
+  public ResponseEntity<Response> register(@RequestBody @Valid AdministrateurDto userRequest, HttpServletRequest request) {
+    return service.register(userRequest, request);
   }
-/*
-  @PostMapping("/registeradmin")
-  public ResponseEntity<Response> registeradmin(
-          @RequestBody @Valid AgentadministratifDto userRequest,
-          HttpServletRequest request
-  )  {
-    return service.register(userRequest,request);
-  }
-*/
+
 
 
   @PostMapping("/registerApprenant")
@@ -54,11 +46,6 @@ public class AuthenticationController {
   )  {
     return service.register(userRequest,request);
   }
-
-
-
-
-  
   @PostMapping("/authenticate")
   public ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest request
@@ -72,8 +59,6 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
-
-
 
   @PostMapping("/logout")
   public void logout(

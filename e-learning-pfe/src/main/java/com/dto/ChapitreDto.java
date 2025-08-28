@@ -12,9 +12,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ChapitreDto {
 
-    private int id;
+    private long id;
     private String contenu;
-    private Integer moduleId; // ⚠️ pour éviter la boucle infinie avec ModuleDto
+    private String titre;
+    private String description;
+    private long moduleId;
 
     // ----------------- MAPPER -----------------
 
@@ -24,6 +26,8 @@ public class ChapitreDto {
         return ChapitreDto.builder()
                 .id(chapitre.getId())
                 .contenu(chapitre.getContenu())
+                .titre(chapitre.getTitre())
+                .description(chapitre.getDescription())
                 .moduleId(chapitre.getModule() != null ? chapitre.getModule().getId() : null)
                 .build();
     }
@@ -34,13 +38,12 @@ public class ChapitreDto {
         Chapitre chapitre = new Chapitre();
         chapitre.setId(dto.getId());
         chapitre.setContenu(dto.getContenu());
-
-        // Ici on met juste un Module avec l'id (lazy load par le service)
-        if (dto.getModuleId() != null) {
+        chapitre.setTitre(dto.getTitre());
+        chapitre.setDescription(dto.getDescription());
             Module module = new Module();
             module.setId(dto.getModuleId());
             chapitre.setModule(module);
-        }
+
 
         return chapitre;
     }

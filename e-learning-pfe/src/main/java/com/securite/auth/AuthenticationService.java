@@ -2,6 +2,7 @@ package com.securite.auth;
 
 
 
+import com.dto.AdministrateurDto;
 import com.dto.ApprenantDto;
 import com.entities.Apprenant;
 import com.repositories.ApprenantRepository;
@@ -16,6 +17,7 @@ import com.securite.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,69 +53,46 @@ public class AuthenticationService {
 	private final ApprenantRepository apprenantRepository;
 
 
-
-	// regigister
+	// register
 	public ResponseEntity<Response> register(RegisterRequest userRequest, final HttpServletRequest request) {
-
-		boolean userExists = repository.findByEmail(userRequest.getEmail()).isPresent();
-
+		// System.err.println(userRequest.getRole());
+		boolean userExists = repository.findAll()
+				.stream()
+				.anyMatch(user -> userRequest.getEmail().equalsIgnoreCase(user.getEmail()));
 		if (userExists) {
-			return ResponseEntity.badRequest()
-					.body(Response.builder().responseMessage("User with provided email  already exists!").build());
-
+			return ResponseEntity.badRequest().body(Response.builder()
+					.responseMessage("User with provided email  already exists!")
+					.build());
 		}
-
 		if (userRequest instanceof ApprenantDto) {
-
-			Apprenant user = new Apprenant();
-			user = ApprenantDto.toEntity((ApprenantDto) userRequest);
-			user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-			Set<String> strRoles = userRequest.getRoles();
-			List<Role> roles = new ArrayList<>();
-
-			if (strRoles == null) {
-				Role userRole = roleRepository.findByName("apprenant")
-						.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-				roles.add(userRole);
-			} else {
-				strRoles.forEach(role -> {
-
-
-					Role administrateurRole = roleRepository.findByName(role)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(administrateurRole);
-
-				});
-			}
-			user.setRoles(roles);
-			user.setEnabled(true);
-			var savedUser = apprenantRepository.save(user);
+			Apprenant apprenant = ApprenantDto.toEntity((ApprenantDto) userRequest);
+			apprenant.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+			apprenant.setRole(Erole.APPRENANT); // ✅ plus besoin de RoleRepository
+			var savedUser = repository.save(apprenant);
 			publisher.publishEvent(new RegistrationCompleteEvent(savedUser, applicationUrl(request)));
-
-
-			Set<String> roleNames = savedUser.getRoles()
-					.stream()
-					.map(Role::getName)
-					.collect(Collectors.toSet());
-
-			return new ResponseEntity<>(Response.builder()
-
-					.responseMessage("Success! Please, check your email to complete your registration")
-					.id(savedUser.getId())
-					.phone(savedUser.getPhone())
-					.adress(savedUser.getAdress())
-					.firstName(savedUser.getFirstName())
-					.lastName(savedUser.getLastName())
-					.password(savedUser.getPassword())
-					.roles(roleNames)
-					.email(savedUser.getEmail()).build(), HttpStatus.CREATED);
+			return new ResponseEntity<>(
+					Response.builder()
+							.responseMessage("Success! Please, check your email to complete your registration")
+							.email(savedUser.getEmail())
+							.build(),
+					HttpStatus.CREATED
+			);
+		} else if (userRequest instanceof AdministrateurDto) {
+			Administrateur user = AdministrateurDto.toEntity((AdministrateurDto) userRequest);
+			user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+			user.setRole(Erole.ADMINISTRATEUR); // ✅ ici aussi
+			var savedUser = repository.save(user);
+			publisher.publishEvent(new RegistrationCompleteEvent(savedUser, applicationUrl(request)));
+			return new ResponseEntity<>(
+					Response.builder()
+							.responseMessage("Success! Please, check your email to complete your registration")
+							.email(savedUser.getEmail())
+							.build(),
+					HttpStatus.CREATED
+			);
 		}
-
-		return null;
-	}
-
-
+        return null;
+    }
 
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -212,7 +192,7 @@ public class AuthenticationService {
 			Role userRole = roleRepository.findByName("AdminSystem")
 					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 			roles.add(userRole);
-			user.setRoles(roles);
+			user.setRole(Erole.AGENTADMINISTRATIF);
 
 			repository.save(user);
 		}

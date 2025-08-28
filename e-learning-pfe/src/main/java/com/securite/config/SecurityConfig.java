@@ -44,6 +44,9 @@ public class SecurityConfig {
             "api/v1/instructor/**",
             "api/v1/apprenant/**",
             "api/v1/formateur/**",
+            "api/v1/categorie/**",
+            "api/v1/module/**",
+            "api/v1/chapitre/**",
 
 
     };
